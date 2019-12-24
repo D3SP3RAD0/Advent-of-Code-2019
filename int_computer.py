@@ -14,12 +14,15 @@ def run(program):
 
             #halt if done
             if opcode == 99:
-                sys.exit("HALT")
+                print("HALT")
+                return(0)
 
             #determine number of parameters needed
             param_count = 3
             if opcode == 3 or opcode == 4:
                 param_count = 1
+            if opcode == 5 or opcode == 6:
+                param_count = 2
 
 
             while len(instruction) < param_count + 2:  #set default parameter as 0
@@ -42,20 +45,57 @@ def run(program):
             except Exception as e:
                 print("Error when determining parameters:", e)
 
-            if opcode == 1:     #add two parameters
+            #add two parameters
+            if opcode == 1:     
                 program[program[i + 3]] = parameter[0] + parameter[1]
                 i = i + 4
-            elif opcode == 2:   #multiply two parameters
+
+            #multiply two parameters
+            elif opcode == 2:   
                 program[program[i + 3]] = parameter[0] * parameter[1]
                 i = i + 4
-            elif opcode == 3:   #gain input
-                program[program[i + 1]] = int(input("Opcode 3 Input:"))
+
+            #gain input
+            elif opcode == 3:   
+                program[program[i + 1]] = int(input("Input:"))
                 i = i + 2
-            elif opcode == 4:   #output only parameter
+
+            #output only parameter
+            elif opcode == 4:   
                 print(parameter[0])
                 i = i + 2
-            elif opcode == 99:
-                sys.exit("HALT")
+
+            #if first parameter != 0, set pointer to value of second parameter    
+            elif opcode == 5:   
+                if parameter[0] != 0:
+                    i = parameter[1]
+                else:
+                    i = i + 3
+
+            #if first paramater == 0 set pointer to value of second parameter        
+            elif opcode == 6:   
+                if parameter[0] == 0:
+                    i = parameter[1]
+                else:
+                    i = i + 3
+
+            #if first parameter is < second parameter, store 1 in the location directed by third parameter        
+            elif opcode == 7:   
+                if parameter[0] < parameter[1]:
+                    store = 1
+                else:
+                    store = 0
+                program[program[i + 3]] = store
+                i = i + 4
+
+            #if the first parameter is equal to the second, store one, otherwise 0
+            elif opcode == 8:   
+                if parameter[0] == parameter[1]:
+                    store = 1
+                else:
+                    store = 0
+                program[program[i + 3]] = store 
+                i = i + 4
             else:
                 print("Error reading opcode...")
                 return 0
